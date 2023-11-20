@@ -23,16 +23,12 @@ public class Post {
     @Column(name = "id")
     private Long id;
 
-
-    // unique, non-nullable
     @Column(name = "title")
     private String title;
 
-    // non-nullable
     @Column(name = "description")
     private String description;
 
-    // non-nullable
     @Column(name = "content")
     private String content;
 
