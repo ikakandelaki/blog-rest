@@ -1,10 +1,14 @@
 package com.blog.service.impl;
 
 import com.blog.dto.PostDto;
+import com.blog.dto.PostResponse;
 import com.blog.entity.Post;
 import com.blog.exception.ResourceNotFoundException;
 import com.blog.repository.PostRepository;
 import com.blog.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,11 +30,28 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPosts() {
-        return postRepository.findAll()
+    public PostResponse getAllPosts(int pageNo, int pageSize, String[] sortBy, String sortDir) {
+        Sort sort = Sort.Direction.ASC.name().equalsIgnoreCase(sortDir)
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize, sort);
+        Page<Post> posts = postRepository.findAll(pageRequest);
+        return getPostResponse(posts);
+    }
+
+    private PostResponse getPostResponse(Page<Post> posts) {
+        List<PostDto> content = posts
                 .stream()
                 .map(this::mapPostEntityToDto)
                 .collect(Collectors.toList());
+        return PostResponse.builder()
+                .content(content)
+                .pageNo(posts.getNumber())
+                .pageSize(posts.getSize())
+                .totalElements(posts.getTotalElements())
+                .totalPages(posts.getTotalPages())
+                .last(posts.isLast())
+                .build();
     }
 
     @Override
