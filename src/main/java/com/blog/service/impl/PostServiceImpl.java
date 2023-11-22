@@ -6,6 +6,7 @@ import com.blog.entity.Post;
 import com.blog.exception.ResourceNotFoundException;
 import com.blog.repository.PostRepository;
 import com.blog.service.PostService;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,9 +18,11 @@ import java.util.stream.Collectors;
 @Service
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
+    private final ModelMapper modelMapper;
 
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper) {
         this.postRepository = postRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -81,19 +84,12 @@ public class PostServiceImpl implements PostService {
     }
 
     private Post mapPostDtoToEntity(PostDto postDto) {
-        return new Post(
-                postDto.getTitle(),
-                postDto.getDescription(),
-                postDto.getContent()
-        );
+        Post post = modelMapper.map(postDto, Post.class);
+        post.setId(null);
+        return post;
     }
 
     private PostDto mapPostEntityToDto(Post post) {
-        return PostDto.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .description(post.getDescription())
-                .content(post.getContent())
-                .build();
+        return modelMapper.map(post, PostDto.class);
     }
 }

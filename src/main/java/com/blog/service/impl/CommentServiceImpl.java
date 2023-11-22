@@ -8,6 +8,7 @@ import com.blog.exception.ResourceNotFoundException;
 import com.blog.repository.CommentRepository;
 import com.blog.repository.PostRepository;
 import com.blog.service.CommentService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -18,18 +19,24 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final ModelMapper modelMapper;
 
-    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository) {
+    public CommentServiceImpl(
+            CommentRepository commentRepository,
+            PostRepository postRepository,
+            ModelMapper modelMapper
+    ) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
     public CommentDto createComment(long postId, CommentDto commentDto) {
-        Comment comment = mapCommentDtoToEntity(commentDto);
+        Comment comment = mapDtoToEntity(commentDto);
         Post post = getPostById(postId);
         comment.setPost(post);
-        return mapCommentEntityToDto(commentRepository.save(comment));
+        return mapEntityToDto(commentRepository.save(comment));
     }
 
     @Override
@@ -37,14 +44,14 @@ public class CommentServiceImpl implements CommentService {
         return getPostById(postId)
                 .getComments()
                 .stream()
-                .map(this::mapCommentEntityToDto)
+                .map(this::mapEntityToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public CommentDto getCommentById(long postId, long commentId) {
         Comment comment = getCommentEntityById(postId, commentId);
-        return mapCommentEntityToDto(comment);
+        return mapEntityToDto(comment);
     }
 
     @Override
@@ -54,7 +61,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setEmail(commentDto.getEmail());
         comment.setBody(commentDto.getBody());
 
-        return mapCommentEntityToDto(commentRepository.save(comment));
+        return mapEntityToDto(commentRepository.save(comment));
     }
 
     @Override
@@ -83,20 +90,13 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Comment", "id", String.valueOf(commentId)));
     }
 
-    private Comment mapCommentDtoToEntity(CommentDto commentDto) {
-        return new Comment(
-                commentDto.getName(),
-                commentDto.getEmail(),
-                commentDto.getBody()
-        );
+    private Comment mapDtoToEntity(CommentDto commentDto) {
+        Comment comment = modelMapper.map(commentDto, Comment.class);
+        comment.setId(null);
+        return comment;
     }
 
-    private CommentDto mapCommentEntityToDto(Comment comment) {
-        return CommentDto.builder()
-                .id(comment.getId())
-                .name(comment.getName())
-                .email(comment.getEmail())
-                .body(comment.getBody())
-                .build();
+    private CommentDto mapEntityToDto(Comment comment) {
+        return modelMapper.map(comment, CommentDto.class);
     }
 }
