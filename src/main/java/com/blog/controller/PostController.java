@@ -4,6 +4,7 @@ import com.blog.dto.PostDto;
 import com.blog.dto.PostResponse;
 import com.blog.service.PostService;
 import com.blog.util.AppConstants;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class PostController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public PostDto createPost(@RequestBody PostDto postDto) {
+    public PostDto createPost(@RequestBody @Valid PostDto postDto) {
         return postService.createPost(postDto);
     }
 
@@ -47,7 +48,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public PostDto updatePost(@PathVariable long id, @RequestBody PostDto postDto) {
+    public PostDto updatePost(@PathVariable long id, @RequestBody @Valid PostDto postDto) {
         return postService.updatePost(id, postDto);
     }
 
