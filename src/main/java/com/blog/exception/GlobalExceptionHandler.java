@@ -2,6 +2,8 @@ package com.blog.exception;
 
 import com.blog.dto.ErrorDetails;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,9 +26,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BlogException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ErrorDetails handleBlogException(BlogException exception, WebRequest webRequest) {
-        return getErrorDetails(exception, webRequest);
+    public ResponseEntity<ErrorDetails> handleBlogException(BlogException exception, WebRequest webRequest) {
+        return new ResponseEntity<>(getErrorDetails(exception, webRequest), exception.getStatus());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -44,6 +45,12 @@ public class GlobalExceptionHandler {
                             oldList.addAll(newList);
                             return oldList;
                         }));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ErrorDetails handleAccessDeniedException(AccessDeniedException exception, WebRequest webRequest) {
+        return getErrorDetails(exception, webRequest);
     }
 
     @ExceptionHandler(Exception.class)
