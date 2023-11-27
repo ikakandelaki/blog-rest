@@ -6,6 +6,7 @@ import com.blog.service.PostService;
 import com.blog.util.AppConstants;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ public class PostController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(value = HttpStatus.CREATED)
     public PostDto createPost(@RequestBody @Valid PostDto postDto) {
         return postService.createPost(postDto);
@@ -48,11 +50,13 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public PostDto updatePost(@PathVariable long id, @RequestBody @Valid PostDto postDto) {
         return postService.updatePost(id, postDto);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deletePostById(@PathVariable long id) {
         postService.deletePostById(id);
