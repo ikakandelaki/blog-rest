@@ -1,5 +1,7 @@
 package com.blog.dto;
 
+import com.blog.entity.Post;
+import com.blog.util.MappingUtil;
 import lombok.Data;
 
 import java.util.List;
@@ -11,4 +13,8 @@ public class PostDto {
     private String description;
     private String content;
     private List<CommentDto> comments;
+
+    public static PostDto ofEntity(Post post) {
+        return MappingUtil.map(post, PostDto.class);
+    }
 }
