@@ -2,12 +2,18 @@ package com.blog.exception;
 
 import com.blog.dto.ErrorDetails;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -21,6 +27,23 @@ public class GlobalExceptionHandler {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ErrorDetails handleBlogException(BlogException exception, WebRequest webRequest) {
         return getErrorDetails(exception, webRequest);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public Map<String, List<String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+        return exception.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(error -> (FieldError) error)
+                .filter(fieldError -> fieldError.getDefaultMessage() != null)
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        error -> new ArrayList<>(List.of(error.getDefaultMessage())),
+                        (oldList, newList) -> {
+                            oldList.addAll(newList);
+                            return oldList;
+                        }));
     }
 
     @ExceptionHandler(Exception.class)

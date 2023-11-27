@@ -2,6 +2,7 @@ package com.blog.controller;
 
 import com.blog.dto.CommentDto;
 import com.blog.service.CommentService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,7 @@ public class CommentController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public CommentDto createComment(@PathVariable long postId, @RequestBody CommentDto commentDto) {
+    public CommentDto createComment(@PathVariable long postId, @RequestBody @Valid CommentDto commentDto) {
         return commentService.createComment(postId, commentDto);
     }
 
@@ -44,7 +45,7 @@ public class CommentController {
     public CommentDto updateComment(
             @PathVariable long postId,
             @PathVariable long id,
-            @RequestBody CommentDto commentDto
+            @RequestBody @Valid CommentDto commentDto
     ) {
         return commentService.updateComment(postId, id, commentDto);
     }
