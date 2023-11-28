@@ -4,6 +4,7 @@ import com.blog.dto.PostDto;
 import com.blog.dto.PostResponse;
 import com.blog.service.PostService;
 import com.blog.util.AppConstants;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
+@SecurityRequirement(name = "Bearer Authentication")
 public class PostController {
     private final PostService postService;
 

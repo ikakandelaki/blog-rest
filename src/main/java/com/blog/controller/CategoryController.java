@@ -2,6 +2,7 @@ package com.blog.controller;
 
 import com.blog.dto.CategoryDto;
 import com.blog.service.CategoryService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
+@SecurityRequirement(name = "Bearer Authentication")
 public class CategoryController {
     private final CategoryService categoryService;
 
