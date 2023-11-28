@@ -1,11 +1,13 @@
 package com.blog.service.impl;
 
+import com.blog.dto.JWTAuthResponse;
 import com.blog.dto.LoginDto;
 import com.blog.dto.RegisterDto;
 import com.blog.entity.User;
 import com.blog.exception.BlogException;
 import com.blog.repository.RoleRepository;
 import com.blog.repository.UserRepository;
+import com.blog.security.JwtTokenProvider;
 import com.blog.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,25 +25,28 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public AuthServiceImpl(
             AuthenticationManager authenticationManager,
             UserRepository userRepository,
             RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder
-    ) {
+            PasswordEncoder passwordEncoder,
+            JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
-    public String login(LoginDto loginDto) {
+    public JWTAuthResponse login(LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsernameOrEmail(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return "User Logged-in successfully";
+
+        return new JWTAuthResponse(jwtTokenProvider.generateToken(authentication));
     }
 
     @Override
