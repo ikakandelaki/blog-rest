@@ -3,6 +3,8 @@ package com.blog.dto;
 import com.blog.entity.Post;
 import com.blog.util.MappingUtil;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -22,6 +24,10 @@ public class PostDto {
 
     @NotBlank(message = "Post content should not be blank")
     private String content;
+
+    @NotNull(message = "category id for post should be provided")
+    @Positive(message = "category id for post should be positive number")
+    private Long categoryId;
 
     private List<CommentDto> comments;
 
