@@ -2,6 +2,7 @@ package com.blog.controller;
 
 import com.blog.dto.CommentDto;
 import com.blog.service.CommentService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts/{postId}/comments")
+@SecurityRequirement(name = "Bearer Authentication")
 public class CommentController {
     private final CommentService commentService;
 
